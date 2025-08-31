@@ -14,14 +14,15 @@
   body{
     margin:0;background:radial-gradient(100% 150% at 50% 0%,#1f2937 0%,#0b1020 55%,#000 100%);
     color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,sans-serif;
-    display:grid;place-items:center;padding:16px;
+    display:grid;place-items:start;padding:16px;
   }
-  .app{width:min(960px,100%);}
+  .app{width:min(960px,100%);margin-inline:auto}
   a{color:#7dd3fc;text-decoration:none} a:hover{text-decoration:underline}
   .header{
     display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;
     background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
     border:1px solid #273042;
+    position:sticky; top:8px; backdrop-filter:blur(8px); z-index:5;
   }
   .header .icon{font-size:28px;padding:12px;border-radius:50%;background:rgba(56,189,248,.18)}
   .stats{display:flex;gap:14px;color:var(--muted);font-weight:600;flex-wrap:wrap}
@@ -63,12 +64,19 @@
   .actions{display:flex;gap:10px;margin-top:12px}
   .footer{margin-top:14px;color:var(--muted);font-size:.85rem}
 
-  /* Modal */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:16px;z-index:20}
-  .sheet{width:min(520px,100%);background:#0b1221;border:1px solid #273042;border-radius:16px;padding:18px}
-
-  /* Practice Mistakes button */
-  .practice{padding:16px;border-radius:16px;border:1px dashed #475569;background:#0b1221}
+  /* “About & Credits” section (no modal) */
+  #aboutSection{margin-top:18px}
+  details.about{
+    border:1px solid #273042; border-radius:16px; background:#0b1221; overflow:hidden;
+  }
+  details.about > summary{
+    list-style:none; cursor:pointer; padding:14px; font-weight:800;
+    background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+    display:flex; align-items:center; gap:10px;
+  }
+  details.about[open] > summary{border-bottom:1px solid #273042}
+  .about-body{padding:16px}
+  .about-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -150,36 +158,31 @@
       <button id="quitBtn" class="ghost">Quit</button>
     </div>
   </section>
+
+  <!-- ABOUT & CREDITS (always on page, no modal) -->
+  <section id="aboutSection">
+    <details id="aboutDetails" class="about">
+      <summary>About & Credits</summary>
+      <div class="about-body">
+        <p style="margin:0 0 10px;color:var(--muted)">
+          Images are fetched from Wikipedia/Wikimedia for each species. Tap the image credit to open the page and see license/author.
+          Data includes native, introduced, stocked, and invasive freshwater species found in Nova Scotia (educational use only).
+        </p>
+        <div class="about-actions">
+          <button id="installBtn" class="ghost">Install</button>
+          <button id="donateBtn2" class="coffee">☕ Buy me a coffee</button>
+          <button id="shareBtn2" class="ghost">Share</button>
+        </div>
+      </div>
+    </details>
+  </section>
 </div>
-// --- About modal: robust open/close ---
-aboutBtn.onclick = () => aboutModal.classList.remove('hide');
-
-const hideAbout = () => aboutModal.classList.add('hide');
-
-// Close by clicking the explicit Close button
-if (closeAbout) {
-  closeAbout.addEventListener('click', hideAbout);
-}
-
-// Close by tapping the dark backdrop (click or touch)
-aboutModal.addEventListener('click', (e) => {
-  if (e.target === aboutModal) hideAbout();
-});
-aboutModal.addEventListener('touchstart', (e) => {
-  if (e.target === aboutModal) hideAbout();
-}, { passive: true });
-
-// Close with Escape key
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !aboutModal.classList.contains('hide')) hideAbout();
-});
 
 <script>
 /*** ---------------------- CONFIG ---------------------- ***/
 const DONATE_URL = "https://www.paypal.me/evanfay782"; // your PayPal link
 
 /*** ---------------------- DATA ---------------------- ***/
-// Status: "native" | "introduced" | "stocked" | "invasive"
 const Difficulty = {
   beginner: {title:"Beginner", questions:8,  color:"var(--beg)"},
   novice:   {title:"Novice",   questions:10, color:"var(--nov)"},
@@ -224,15 +227,17 @@ const heartsEl=$("#hearts"), levelName=$("#levelName"), qIndexEl=$("#qIndex"), q
 const img=$("#img"), imgLoader=$("#imgLoader"), credit=$("#credit");
 const opts=$("#opts"), resultEl=$("#result");
 const nextBtn=$("#nextBtn"), quitBtn=$("#quitBtn");
-const aboutBtn=$("#aboutBtn"), aboutModal=$("#aboutModal"), closeAbout=$("#closeAbout"), installBtn=$("#installBtn");
-const shareBtn=$("#shareBtn"), donateBtn=$("#donateBtn"), donateBtn2=$("#donateBtn2");
+const aboutBtn=$("#aboutBtn"), aboutDetails=$("#aboutDetails");
+const installBtn=$("#installBtn");
+const shareBtn=$("#shareBtn"), shareBtn2=$("#shareBtn2");
+const donateBtn=$("#donateBtn"), donateBtn2=$("#donateBtn2");
 const practiceCard=$("#practiceCard"), practiceBtn=$("#practiceBtn"), practiceCount=$("#practiceCount");
 
 let store = {
   xp: +localStorage.getItem("xp") || 0,
   streak: +localStorage.getItem("streak") || 0,
   unlocked: localStorage.getItem("unlocked") || "beginner",
-  mistakes: JSON.parse(localStorage.getItem("mistakes")||"[]") // array of fish ids (scientific names)
+  mistakes: JSON.parse(localStorage.getItem("mistakes")||"[]")
 };
 renderStats(); renderPracticeCard();
 
@@ -269,7 +274,7 @@ function renderPracticeCard(){
 
 /*** ---------------------- QUIZ ENGINE ---------------------- ***/
 let vm = {
-  mode: "level",       // "level" | "practice"
+  mode: "level",
   levelKey: "beginner",
   hearts: 3,
   questions: [],
@@ -355,13 +360,12 @@ function answer(chosen){
     addXP(10);
     resultEl.className = "result ok";
     resultEl.textContent = "Correct!";
-    // if practicing, remove from mistakes; if in lesson and user previously missed it, also clear
     clearMistake(q.fish.id);
   }else{
     vm.hearts -= 1; heartsEl.textContent = String(vm.hearts);
     resultEl.className = "result no";
     resultEl.textContent = `Answer: ${q.fish.common}`;
-    addMistake(q.fish.id); // track for practice
+    addMistake(q.fish.id);
   }
   [...opts.children].forEach(b=>b.disabled = true);
   nextBtn.disabled = false;
@@ -378,7 +382,7 @@ function finish(passed){
   if(vm.mode==="level" && passed && vm.hearts > 0){
     const nextIdx = Math.min(order.indexOf(vm.levelKey)+1, order.length-1);
     unlockIfNeeded(order[nextIdx]);
-    addXP( (Difficulty[vm.levelKey].questions) * 5 ); // small bonus
+    addXP( (Difficulty[vm.levelKey].questions) * 5 );
   }
   showSheet(`
     <h3 style="margin:0 0 6px">${passed? "Nice work!" : "Out of hearts"}</h3>
@@ -422,7 +426,7 @@ async function wikiImage(title){
 function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
 function showSheet(html, wire){
   const modal = document.createElement("div");
-  modal.className = "modal";
+  modal.className = "modal"; // reuse styles for nice look
   modal.innerHTML = `<div class="sheet">${html}</div>`;
   document.body.appendChild(modal);
   const close = ()=>{ modal.remove(); };
@@ -437,43 +441,45 @@ document.querySelectorAll(".level").forEach(el=>{
 nextBtn.addEventListener('click', next);
 quitBtn.addEventListener('click', goHome);
 
-// About modal: open + robust close (button or backdrop)
-aboutBtn.onclick = () => aboutModal.classList.remove("hide");
-aboutModal.addEventListener('click', (e) => {
-  const clickedBackdrop = e.target === aboutModal;
-  const clickedClose = e.target.id === 'closeAbout';
-  if (clickedBackdrop || clickedClose) {
-    aboutModal.classList.add('hide');
+// About button: open the inline details and scroll to it
+aboutBtn.addEventListener('click', () => {
+  if (aboutDetails) {
+    aboutDetails.open = true;
+    aboutDetails.scrollIntoView({behavior:'smooth', block:'start'});
   }
 });
 
+// Donate buttons
 donateBtn.onclick = ()=> window.open(DONATE_URL, "_blank", "noopener");
 donateBtn2.onclick = ()=> window.open(DONATE_URL, "_blank", "noopener");
+
+// Practice
 practiceBtn.onclick = ()=> startPractice();
 
-// Share button
-shareBtn.onclick = async ()=>{
+// Share (header + about)
+function doShare(){
   const shareData = {
     title: "NS Fish Trainer",
     text: "Duolingo-style Nova Scotia fish ID trainer 🐟",
     url: window.location.href
   };
   if (navigator.share) {
-    try { await navigator.share(shareData); } catch(_) {}
+    navigator.share(shareData).catch(()=>{});
   } else {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(window.location.href).then(()=>{
       showSheet(`<p style="margin:0 0 10px">Link copied! Paste it anywhere to share.</p>
                  <div class="row"><div></div><div style="margin-left:auto"><button id="okClose">OK</button></div></div>`,
         ({close})=>{ $("#okClose").onclick = close; });
-    } catch {
+    }).catch(()=>{
       showSheet(`<p style="margin:0 0 10px">Couldn’t copy automatically. Here’s the link:</p>
                  <input value="${window.location.href}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #273042;background:#0b1221;color:#e5e7eb" />
                  <div class="row" style="margin-top:10px"><div></div><div style="margin-left:auto"><button id="okClose2">OK</button></div></div>`,
         ({close})=>{ $("#okClose2").onclick = close; });
-    }
+    });
   }
-};
+}
+shareBtn.onclick = doShare;
+shareBtn2.onclick = doShare;
 
 /*** ---------------------- PWA: manifest + SW + install ---------------------- ***/
 // dynamic manifest
@@ -517,12 +523,18 @@ if('serviceWorker' in navigator){
 // install prompt (Android/Chrome); iOS uses Share → Add to Home Screen
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt', e=>{
-  e.preventDefault(); deferredPrompt=e; installBtn.textContent="Install app"; installBtn.onclick=async ()=>{
-    if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null;
-  };
+  e.preventDefault(); deferredPrompt=e; if(installBtn) installBtn.textContent="Install app";
+  if(installBtn){
+    installBtn.onclick=async ()=>{
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt=null;
+    };
+  }
 });
 
-// iOS fallback: show instructions instead of doing nothing
+// iOS fallback: show instructions
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 if (isIOS && installBtn) {
   installBtn.addEventListener('click', () => {
