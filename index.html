@@ -64,7 +64,7 @@
   .actions{display:flex;gap:10px;margin-top:12px}
   .footer{margin-top:14px;color:var(--muted);font-size:.85rem}
 
-  /* “About & Credits” section (no modal) */
+  /* About section (inline, no modal) */
   #aboutSection{margin-top:18px}
   details.about{
     border:1px solid #273042; border-radius:16px; background:#0b1221; overflow:hidden;
@@ -159,7 +159,7 @@
     </div>
   </section>
 
-  <!-- ABOUT & CREDITS (always on page, no modal) -->
+  <!-- ABOUT & CREDITS (inline, no modal) -->
   <section id="aboutSection">
     <details id="aboutDetails" class="about">
       <summary>About & Credits</summary>
@@ -180,7 +180,7 @@
 
 <script>
 /*** ---------------------- CONFIG ---------------------- ***/
-const DONATE_URL = "https://www.paypal.me/evanfay782"; // your PayPal link
+const DONATE_URL = "https://www.paypal.me/evanfay782";
 
 /*** ---------------------- DATA ---------------------- ***/
 const Difficulty = {
@@ -192,7 +192,6 @@ const Difficulty = {
 const order = ["beginner","novice","master","grandMaster"];
 
 const FISH = [
-  // Beginner
   S("Brook Trout","Salvelinus fontinalis","Brook trout",["native"],"beginner",["salmonid"]),
   S("Yellow Perch","Perca flavescens","Yellow perch",["native"],"beginner",["perch"]),
   S("White Perch","Morone americana","White perch",["native"],"beginner",["lakes/slow rivers"]),
@@ -201,18 +200,15 @@ const FISH = [
   S("Pumpkinseed","Lepomis gibbosus","Pumpkinseed",["introduced"],"beginner",["sunfish"]),
   S("Rainbow Trout","Oncorhynchus mykiss","Rainbow trout",["introduced","stocked"],"beginner",["stocked"]),
   S("Brown Trout","Salmo trutta","Brown trout",["introduced","stocked"],"beginner",["naturalized"]),
-  // Novice
   S("White Sucker","Catostomus commersonii","White sucker",["native"],"novice",["sucker"]),
   S("American Eel","Anguilla rostrata","American eel",["native"],"novice",["catadromous"]),
   S("Banded Killifish","Fundulus diaphanus","Banded killifish",["native"],"novice",["weedy shallows"]),
   S("Golden Shiner","Notemigonus crysoleucas","Golden shiner",["native"],"novice",["baitfish"]),
   S("Rainbow Smelt (freshwater)","Osmerus mordax","Rainbow smelt",["native"],"novice",["landlocked/anadromous"]),
-  // Master
   S("Lake Whitefish","Coregonus clupeaformis","Lake whitefish",["native"],"master",["whitefish"]),
   S("Threespine Stickleback","Gasterosteus aculeatus","Three-spined stickleback",["native"],"master",["coastal & inland"]),
   S("Ninespine Stickleback","Pungitius pungitius","Nine-spined stickleback",["native"],"master",["ponds"]),
   S("Splake (hybrid)","Salvelinus namaycush × S. fontinalis","Splake",["stocked"],"master",["hybrid"]),
-  // Grand Master
   S("Atlantic Salmon (parr)","Salmo salar","Atlantic salmon",["native"],"grandMaster",["juvenile ID"]),
   S("Blacknose Dace","Rhinichthys atratulus","Blacknose dace",["native"],"grandMaster",["minnow"]),
   S("Atlantic Whitefish","Coregonus huntsmani","Atlantic whitefish",["native"],"grandMaster",["endemic"]),
@@ -273,17 +269,13 @@ function renderPracticeCard(){
 }
 
 /*** ---------------------- QUIZ ENGINE ---------------------- ***/
-let vm = {
-  mode: "level",
-  levelKey: "beginner",
-  hearts: 3,
-  questions: [],
-  idx: 0,
-  currentImage: null
-};
+let vm = { mode:"level", levelKey:"beginner", hearts:3, questions:[], idx:0 };
 function startPractice(){
   const pool = FISH.filter(f=>store.mistakes.includes(f.id));
-  if(pool.length===0){ showSheet("<p>No mistakes saved yet. Miss a species in lessons and it will appear here.</p><div class='row' style='margin-top:8px'><div></div><div style='margin-left:auto'><button id='ok'>OK</button></div></div>", ({close})=>{$("#ok").onclick=close}); return; }
+  if(pool.length===0){
+    showSheet("<p>No mistakes saved yet. Miss a species in lessons and it will appear here.</p><div class='row' style='margin-top:8px'><div></div><div style='margin-left:auto'><button id='ok'>OK</button></div></div>", ({close})=>{$("#ok").onclick=close});
+    return;
+  }
   vm.mode="practice"; startLessonInternal(pool, "Practice");
 }
 function startLesson(levelKey){
@@ -313,7 +305,6 @@ function startLessonInternal(pool, title, levelKey=null){
   loadImage();
   renderQ();
 }
-
 function renderQ(){
   qIndexEl.textContent = String(vm.idx+1);
   const q = vm.questions[vm.idx];
@@ -327,6 +318,43 @@ function renderQ(){
   });
   resultEl.className="result"; resultEl.textContent="";
   nextBtn.disabled = true;
+}
+
+/*** ---------------------- IMAGE LOADER (with Wikimedia fallback) ---------------------- ***/
+async function wikiImage(title){
+  // 1) Try REST summary (fast)
+  const sURL = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+  try{
+    const r = await fetch(sURL, {mode:'cors', cache:'force-cache'});
+    if(r.ok){
+      const j = await r.json();
+      const src = j.originalimage?.source || j.thumbnail?.source || null;
+      const page = j.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
+      if(src) return {url:src, page};
+    }
+  }catch(_){}
+
+  // 2) Fallback to PageImages API (often finds something when summary has none)
+  try{
+    const api = new URL('https://commons.wikimedia.org/w/api.php');
+    api.search = new URLSearchParams({
+      origin:'*',
+      action:'query',
+      titles:title,
+      prop:'pageimages',
+      piprop:'original|thumbnail',
+      pithumbsize:'1000',
+      format:'json'
+    }).toString();
+    const r2 = await fetch(api.toString(), {mode:'cors'});
+    const j2 = await r2.json();
+    const pageObj = Object.values(j2.query?.pages || {})[0] || {};
+    const src = pageObj.original?.source || pageObj.thumbnail?.source || null;
+    if(src) return {url:src, page:`https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`};
+  }catch(_){}
+
+  // 3) Give up
+  return {url:null, page:`https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`};
 }
 
 async function loadImage(){
@@ -344,14 +372,15 @@ async function loadImage(){
     };
     img.onerror = ()=>{
       imgLoader.classList.add("hide");
-      credit.innerHTML = `<span style="color:#fca5a5">No image available</span>`;
+      credit.innerHTML = `<span style="color:#fca5a5">Image failed to load — try Next.</span>`;
     };
   }else{
     imgLoader.classList.add("hide");
-    credit.innerHTML = `<span style="color:#fca5a5">No image available</span>`;
+    credit.innerHTML = `<span style="color:#fca5a5">No image available for this species — tap Next.</span>`;
   }
 }
 
+/*** ---------------------- Quiz flow ---------------------- ***/
 function answer(chosen){
   const q = vm.questions[vm.idx];
   const correct = chosen.id === q.fish.id;
@@ -370,14 +399,12 @@ function answer(chosen){
   [...opts.children].forEach(b=>b.disabled = true);
   nextBtn.disabled = false;
 }
-
 function next(){
   if(vm.hearts <= 0){ return finish(false); }
   vm.idx += 1;
   if(vm.idx >= vm.questions.length){ return finish(true); }
   renderQ(); loadImage();
 }
-
 function finish(passed){
   if(vm.mode==="level" && passed && vm.hearts > 0){
     const nextIdx = Math.min(order.indexOf(vm.levelKey)+1, order.length-1);
@@ -399,35 +426,19 @@ function finish(passed){
     $("#homeBtn").onclick  = ()=>{ close(); goHome(); };
   });
 }
-
 function goHome(){
   lesson.classList.add("hide");
   home.classList.remove("hide");
   renderStats(); renderPracticeCard();
 }
 
-/*** ---------------------- WIKIPEDIA IMAGE ---------------------- ***/
-async function wikiImage(title){
-  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
-  try{
-    const r = await fetch(url, {mode:'cors', cache:'force-cache'});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const j = await r.json();
-    const original = j.originalimage?.source;
-    const thumb = j.thumbnail?.source;
-    const page = j.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
-    return { url: original || thumb || null, page };
-  }catch(e){
-    return { url:null, page:`https://en.wikipedia.org/wiki/${encodeURIComponent(title)}` };
-  }
-}
-
 /*** ---------------------- UI HELPERS ---------------------- ***/
 function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
 function showSheet(html, wire){
   const modal = document.createElement("div");
-  modal.className = "modal"; // reuse styles for nice look
-  modal.innerHTML = `<div class="sheet">${html}</div>`;
+  modal.style.position='fixed'; modal.style.inset='0'; modal.style.background='rgba(0,0,0,.6)';
+  modal.style.display='grid'; modal.style.placeItems='center'; modal.style.padding='16px'; modal.style.zIndex='50';
+  modal.innerHTML = `<div style="width:min(520px,100%);background:#0b1221;border:1px solid #273042;border-radius:16px;padding:18px">${html}</div>`;
   document.body.appendChild(modal);
   const close = ()=>{ modal.remove(); };
   modal.addEventListener('click', e=>{ if(e.target===modal) close(); });
@@ -435,19 +446,12 @@ function showSheet(html, wire){
 }
 
 /*** ---------------------- EVENTS ---------------------- ***/
-document.querySelectorAll(".level").forEach(el=>{
-  el.addEventListener('click', ()=> startLesson(el.dataset.level));
-});
+document.querySelectorAll(".level").forEach(el=> el.addEventListener('click', ()=> startLesson(el.dataset.level)));
 nextBtn.addEventListener('click', next);
 quitBtn.addEventListener('click', goHome);
 
-// About button: open the inline details and scroll to it
-aboutBtn.addEventListener('click', () => {
-  if (aboutDetails) {
-    aboutDetails.open = true;
-    aboutDetails.scrollIntoView({behavior:'smooth', block:'start'});
-  }
-});
+// About button opens inline details
+aboutBtn.addEventListener('click', () => { aboutDetails.open = true; aboutDetails.scrollIntoView({behavior:'smooth'}); });
 
 // Donate buttons
 donateBtn.onclick = ()=> window.open(DONATE_URL, "_blank", "noopener");
@@ -458,15 +462,10 @@ practiceBtn.onclick = ()=> startPractice();
 
 // Share (header + about)
 function doShare(){
-  const shareData = {
-    title: "NS Fish Trainer",
-    text: "Duolingo-style Nova Scotia fish ID trainer 🐟",
-    url: window.location.href
-  };
-  if (navigator.share) {
-    navigator.share(shareData).catch(()=>{});
-  } else {
-    navigator.clipboard.writeText(window.location.href).then(()=>{
+  const shareData = { title:"NS Fish Trainer", text:"Duolingo-style Nova Scotia fish ID trainer 🐟", url: window.location.href };
+  if (navigator.share) { navigator.share(shareData).catch(()=>{}); }
+  else {
+    navigator.clipboard.writeText(window.location.href).then(()=> {
       showSheet(`<p style="margin:0 0 10px">Link copied! Paste it anywhere to share.</p>
                  <div class="row"><div></div><div style="margin-left:auto"><button id="okClose">OK</button></div></div>`,
         ({close})=>{ $("#okClose").onclick = close; });
@@ -482,34 +481,24 @@ shareBtn.onclick = doShare;
 shareBtn2.onclick = doShare;
 
 /*** ---------------------- PWA: manifest + SW + install ---------------------- ***/
-// dynamic manifest
 const manifest = {
-  name:"NS Fish Trainer",
-  short_name:"NS Fish",
-  start_url:"./",
-  display:"standalone",
-  background_color:"#0f172a",
-  theme_color:"#0f172a",
-  icons:[{
-    src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%230f172a'/%3E%3Cpath d='M20 70c18-14 36-22 56-22 8 0 16 6 24 12-8 6-16 12-24 12-18 0-32 6-44 16l-12-18z' fill='%2322c55e'/%3E%3Ccircle cx='84' cy='56' r='5' fill='%23000'/%3E%3C/svg%3E",
-    sizes:"128x128", type:"image/svg+xml"}]
+  name:"NS Fish Trainer", short_name:"NS Fish", start_url:"./", display:"standalone",
+  background_color:"#0f172a", theme_color:"#0f172a",
+  icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%230f172a'/%3E%3Cpath d='M20 70c18-14 36-22 56-22 8 0 16 6 24 12-8 6-16 12-24 12-18 0-32 6-44 16l-12-18z' fill='%2322c55e'/%3E%3Ccircle cx='84' cy='56' r='5' fill='%23000'/%3E%3C/svg%3E",sizes:"128x128", type:"image/svg+xml"}]
 };
 const mblob = new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"});
 const murl = URL.createObjectURL(mblob);
 const mlink = document.createElement('link'); mlink.rel='manifest'; mlink.href=murl; document.head.appendChild(mlink);
 
-// service worker (cache app shell; network-first for images)
+// Service worker
 if('serviceWorker' in navigator){
   const swCode = `
     const CACHE='ns-fish-v1';
-    self.addEventListener('install',e=>{
-      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
-      self.skipWaiting();
-    });
+    self.addEventListener('install',e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./']))); self.skipWaiting(); });
     self.addEventListener('activate',e=> self.clients.claim());
     self.addEventListener('fetch',e=>{
       const req=e.request;
-      if(req.destination==='image' || req.url.includes('wikipedia.org')){
+      if(req.destination==='image' || req.url.includes('wikipedia.org') || req.url.includes('wikimedia.org')){
         e.respondWith(fetch(req).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(req,copy));return r;}).catch(()=>caches.match(req)));
       }else{
         e.respondWith(caches.match(req).then(hit=>hit||fetch(req)));
@@ -520,7 +509,7 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register(URL.createObjectURL(blob));
 }
 
-// install prompt (Android/Chrome); iOS uses Share → Add to Home Screen
+// Install: Chrome/Android prompt + iOS instructions
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault(); deferredPrompt=e; if(installBtn) installBtn.textContent="Install app";
@@ -533,22 +522,16 @@ window.addEventListener('beforeinstallprompt', e=>{
     };
   }
 });
-
-// iOS fallback: show instructions
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-if (isIOS && installBtn) {
+if(/iphone|ipad|ipod/i.test(navigator.userAgent) && installBtn){
   installBtn.addEventListener('click', () => {
-    showSheet(
-      `<p style="margin:0 0 10px">On iPhone/iPad: tap the Share button, then “Add to Home Screen”.</p>
-       <div class="row"><div></div><div style="margin-left:auto"><button id="ok">OK</button></div></div>`,
-      ({close}) => { document.querySelector('#ok').onclick = close; }
-    );
+    showSheet(`<p style="margin:0 0 10px">On iPhone/iPad: tap the Share button, then “Add to Home Screen”.</p>
+               <div class="row"><div></div><div style="margin-left:auto"><button id="ok">OK</button></div></div>`,
+      ({close})=>{ document.querySelector('#ok').onclick = close; });
   });
 }
 
 /*** ---------------------- START ---------------------- ***/
 function initKeyboard(){
-  // N = Next, H = Home
   window.addEventListener('keydown', (e)=>{
     if(e.key.toLowerCase()==='n' && !nextBtn.disabled) next();
     if(e.key.toLowerCase()==='h') goHome();
