@@ -430,8 +430,17 @@ document.querySelectorAll(".level").forEach(el=>{
 });
 nextBtn.addEventListener('click', next);
 quitBtn.addEventListener('click', goHome);
-aboutBtn.onclick = ()=> aboutModal.classList.remove("hide");
-closeAbout.onclick = ()=> aboutModal.classList.add("hide");
+
+// About modal: open + robust close (button or backdrop)
+aboutBtn.onclick = () => aboutModal.classList.remove("hide");
+aboutModal.addEventListener('click', (e) => {
+  const clickedBackdrop = e.target === aboutModal;
+  const clickedClose = e.target.id === 'closeAbout';
+  if (clickedBackdrop || clickedClose) {
+    aboutModal.classList.add('hide');
+  }
+});
+
 donateBtn.onclick = ()=> window.open(DONATE_URL, "_blank", "noopener");
 donateBtn2.onclick = ()=> window.open(DONATE_URL, "_blank", "noopener");
 practiceBtn.onclick = ()=> startPractice();
@@ -506,6 +515,18 @@ window.addEventListener('beforeinstallprompt', e=>{
     if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null;
   };
 });
+
+// iOS fallback: show instructions instead of doing nothing
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+if (isIOS && installBtn) {
+  installBtn.addEventListener('click', () => {
+    showSheet(
+      `<p style="margin:0 0 10px">On iPhone/iPad: tap the Share button, then “Add to Home Screen”.</p>
+       <div class="row"><div></div><div style="margin-left:auto"><button id="ok">OK</button></div></div>`,
+      ({close}) => { document.querySelector('#ok').onclick = close; }
+    );
+  });
+}
 
 /*** ---------------------- START ---------------------- ***/
 function initKeyboard(){
