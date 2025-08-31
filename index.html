@@ -151,22 +151,28 @@
     </div>
   </section>
 </div>
+// --- About modal: robust open/close ---
+aboutBtn.onclick = () => aboutModal.classList.remove('hide');
 
-<!-- ABOUT MODAL -->
-<div id="aboutModal" class="modal hide">
-  <div class="sheet">
-    <h3 style="margin:0 0 6px">About & Credits</h3>
-    <p style="margin:0 0 10px;color:var(--muted)">
-      Images are fetched from Wikipedia/Wikimedia for each species. Tap the image credit to open the page and see license/author.
-      Data includes native, introduced, stocked, and invasive freshwater species found in Nova Scotia (educational use only).
-    </p>
-    <div class="row">
-      <button id="installBtn" class="ghost">Install</button>
-      <button id="donateBtn2" class="coffee">☕ Buy me a coffee</button>
-      <div style="margin-left:auto"><button id="closeAbout">Close</button></div>
-    </div>
-  </div>
-</div>
+const hideAbout = () => aboutModal.classList.add('hide');
+
+// Close by clicking the explicit Close button
+if (closeAbout) {
+  closeAbout.addEventListener('click', hideAbout);
+}
+
+// Close by tapping the dark backdrop (click or touch)
+aboutModal.addEventListener('click', (e) => {
+  if (e.target === aboutModal) hideAbout();
+});
+aboutModal.addEventListener('touchstart', (e) => {
+  if (e.target === aboutModal) hideAbout();
+}, { passive: true });
+
+// Close with Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !aboutModal.classList.contains('hide')) hideAbout();
+});
 
 <script>
 /*** ---------------------- CONFIG ---------------------- ***/
