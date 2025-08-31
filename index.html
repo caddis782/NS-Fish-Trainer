@@ -8,7 +8,7 @@
 <style>
   :root{
     --bg:#0f172a;--ink:#e5e7eb;--muted:#9ca3af;--card:#111827;--chip:#1f2937;--accent:#22c55e;
-    --beg:#22c55e;--nov:#38bdf8;--mas:#a78bfa;--gm:#f59e0b;
+    --white:#e5e7eb;--blue:#38bdf8;--purple:#a78bfa;--brown:#a16207;--black:#111827;
   }
   html,body{height:100%}
   body{
@@ -21,37 +21,32 @@
   .header{
     display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;
     background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
-    border:1px solid #273042;
-    position:sticky; top:8px; backdrop-filter:blur(8px); z-index:5;
+    border:1px solid #273042; position:sticky; top:8px; backdrop-filter:blur(8px); z-index:5;
   }
   .header .icon{font-size:28px;padding:12px;border-radius:50%;background:rgba(56,189,248,.18)}
   .stats{display:flex;gap:14px;color:var(--muted);font-weight:600;flex-wrap:wrap}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
-  .level{padding:16px;border-radius:16px;border:1px solid #273042;cursor:pointer;transition:transform .06s ease}
-  .level:hover{transform:translateY(-1px)} .level h3{margin:0 0 6px}
-  .lvl-beg{background:color-mix(in oklab,var(--beg) 18%, transparent)}
-  .lvl-nov{background:color-mix(in oklab,var(--nov) 18%, transparent)}
-  .lvl-mas{background:color-mix(in oklab,var(--mas) 18%, transparent)}
-  .lvl-gm{background:color-mix(in oklab,var(--gm) 18%, transparent)}
-  .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-  .hide{display:none}
   .buttons{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
-
   .ghost{
     background:rgba(255,255,255,.06);color:var(--ink);
     border:1px solid #273042; font-weight:700; padding:9px 13px; border-radius:12px; cursor:pointer;
   }
   button{transition:transform .05s ease,filter .2s ease;touch-action:manipulation}
   button:active{transform:translateY(1px)}
-  .coffee{
-    background:#ffdd00;color:#111;border:0;font-weight:800;padding:9px 13px;border-radius:12px;cursor:pointer;
-  }
+  .coffee{background:#ffdd00;color:#111;border:0;font-weight:800;padding:9px 13px;border-radius:12px;cursor:pointer}
+  .start{margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid #273042}
+  .belt{font-weight:800;padding:6px 10px;border-radius:999px;border:1px solid #273042}
+  .belt.white{background:rgba(229,231,235,.15);color:#fff}
+  .belt.blue{background:rgba(56,189,248,.18)}
+  .belt.purple{background:rgba(167,139,250,.18)}
+  .belt.brown{background:rgba(161,98,7,.25)}
+  .belt.black{background:rgba(17,24,39,.8)}
+  .footer{margin-top:14px;color:var(--muted);font-size:.85rem}
 
   /* Lesson */
   .topbar{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-top:12px}
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid #273042}
   .card{position:relative;border-radius:20px;overflow:hidden;background:var(--card);box-shadow:0 10px 40px rgba(0,0,0,.45);margin-top:12px}
-  .frame{aspect-ratio:16/9;display:grid;place-items:center;background:#071023}
+  .frame{aspect-ratio:16/9;display:grid;place-items:center;background:#071023;position:relative}
   img{max-width:100%;max-height:100%;object-fit:contain;display:block}
   .credit{margin-top:8px;color:var(--muted);font-size:.9rem}
   .q{margin-top:12px;font-weight:800}
@@ -62,18 +57,16 @@
   .result{display:flex;gap:8px;align-items:center;margin-top:8px}
   .result.ok{color:#86efac} .result.no{color:#fca5a5}
   .actions{display:flex;gap:10px;margin-top:12px}
-  .footer{margin-top:14px;color:var(--muted);font-size:.85rem}
 
-  /* About section (inline, no modal) */
+  /* Practice card */
+  .practice{padding:16px;border-radius:16px;border:1px dashed #475569;background:#0b1221;margin-top:14px}
+  .hide{display:none}
+
+  /* About (inline) */
   #aboutSection{margin-top:18px}
-  details.about{
-    border:1px solid #273042; border-radius:16px; background:#0b1221; overflow:hidden;
-  }
-  details.about > summary{
-    list-style:none; cursor:pointer; padding:14px; font-weight:800;
-    background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
-    display:flex; align-items:center; gap:10px;
-  }
+  details.about{border:1px solid #273042; border-radius:16px; background:#0b1221; overflow:hidden}
+  details.about > summary{list-style:none; cursor:pointer; padding:14px; font-weight:800;
+    background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02)); display:flex; gap:10px}
   details.about[open] > summary{border-bottom:1px solid #273042}
   .about-body{padding:16px}
   .about-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
@@ -90,7 +83,7 @@
         <div class="stats">
           <div>⚡ <span id="xp">0</span> XP</div>
           <div>🔥 Streak <span id="streak">0</span></div>
-          <div>🔓 <span id="unlocked">Beginner</span></div>
+          <div>🥋 Rank <span id="rankLabel" class="belt white">White</span></div>
         </div>
       </div>
       <div class="buttons">
@@ -100,8 +93,14 @@
       </div>
     </div>
 
+    <div class="start">
+      <button id="startBtn" class="ghost">Start 50-question run</button>
+      <span class="badge">❤️ <span id="heartsHome">3</span></span>
+      <span class="badge">Best: <span id="bestPercent">0%</span></span>
+    </div>
+
     <div id="practiceCard" class="practice hide">
-      <div class="row">
+      <div class="row" style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <strong>Practice your mistakes</strong>
           <div style="color:var(--muted);font-size:.9rem" id="practiceCount">0 species saved</div>
@@ -110,39 +109,20 @@
       </div>
     </div>
 
-    <div class="grid" style="margin-top:14px">
-      <div class="level lvl-beg" data-level="beginner">
-        <h3>Beginner</h3>
-        <div class="row"><div>8 questions • 3 hearts</div><div>→</div></div>
-      </div>
-      <div class="level lvl-nov" data-level="novice">
-        <h3>Novice</h3>
-        <div class="row"><div>10 questions • 3 hearts</div><div>→</div></div>
-      </div>
-      <div class="level lvl-mas" data-level="master">
-        <h3>Master</h3>
-        <div class="row"><div>12 questions • 3 hearts</div><div>→</div></div>
-      </div>
-      <div class="level lvl-gm" data-level="grandMaster">
-        <h3>Grand Master</h3>
-        <div class="row"><div>12 questions • 3 hearts</div><div>→</div></div>
-      </div>
-    </div>
-
     <div class="footer">Tip: Add to Home Screen to use like an app. Works offline after first load.</div>
   </section>
 
-  <!-- LESSON -->
+  <!-- QUIZ -->
   <section id="lesson" class="hide">
     <div class="topbar">
       <div class="badge">❤️ <span id="hearts">3</span></div>
-      <div class="badge" id="levelName">Beginner</div>
-      <div class="badge">Q <span id="qIndex">1</span>/<span id="qTotal">8</span></div>
+      <div class="badge">Q <span id="qIndex">1</span>/50</div>
+      <div class="badge">✅ <span id="correctCount">0</span></div>
     </div>
 
     <div class="card">
       <div class="frame" id="imgFrame">
-        <div id="imgLoader" class="center" style="padding:14px">Loading image…</div>
+        <div id="imgLoader" class="center" style="padding:14px">Loading image… (tap image to change)</div>
         <img id="img" alt="Fish for ID" class="hide">
       </div>
     </div>
@@ -159,14 +139,13 @@
     </div>
   </section>
 
-  <!-- ABOUT & CREDITS (inline, no modal) -->
+  <!-- ABOUT -->
   <section id="aboutSection">
     <details id="aboutDetails" class="about">
       <summary>About & Credits</summary>
       <div class="about-body">
         <p style="margin:0 0 10px;color:var(--muted)">
-          Images are fetched from Wikipedia/Wikimedia for each species. Tap the image credit to open the page and see license/author.
-          Data includes native, introduced, stocked, and invasive freshwater species found in Nova Scotia (educational use only).
+          Images are pulled from Wikipedia and Wikimedia Commons via their public APIs (license-friendly). Tap the image credit to open the source page.
         </p>
         <div class="about-actions">
           <button id="installBtn" class="ghost">Install</button>
@@ -179,52 +158,55 @@
 </div>
 
 <script>
-/*** ---------------------- CONFIG ---------------------- ***/
+/*** ---------------------- CONFIG / RANKING ---------------------- ***/
 const DONATE_URL = "https://www.paypal.me/evanfay782";
 
-/*** ---------------------- DATA ---------------------- ***/
-const Difficulty = {
-  beginner: {title:"Beginner", questions:8,  color:"var(--beg)"},
-  novice:   {title:"Novice",   questions:10, color:"var(--nov)"},
-  master:   {title:"Master",   questions:12, color:"var(--mas)"},
-  grandMaster:{title:"Grand Master", questions:12, color:"var(--gm)"},
-};
-const order = ["beginner","novice","master","grandMaster"];
-
-const FISH = [
-  S("Brook Trout","Salvelinus fontinalis","Brook trout",["native"],"beginner",["salmonid"]),
-  S("Yellow Perch","Perca flavescens","Yellow perch",["native"],"beginner",["perch"]),
-  S("White Perch","Morone americana","White perch",["native"],"beginner",["lakes/slow rivers"]),
-  S("Smallmouth Bass","Micropterus dolomieu","Smallmouth bass",["introduced","invasive"],"beginner",["sunfish"]),
-  S("Chain Pickerel","Esox niger","Chain pickerel",["introduced","invasive"],"beginner",["pike family"]),
-  S("Pumpkinseed","Lepomis gibbosus","Pumpkinseed",["introduced"],"beginner",["sunfish"]),
-  S("Rainbow Trout","Oncorhynchus mykiss","Rainbow trout",["introduced","stocked"],"beginner",["stocked"]),
-  S("Brown Trout","Salmo trutta","Brown trout",["introduced","stocked"],"beginner",["naturalized"]),
-  S("White Sucker","Catostomus commersonii","White sucker",["native"],"novice",["sucker"]),
-  S("American Eel","Anguilla rostrata","American eel",["native"],"novice",["catadromous"]),
-  S("Banded Killifish","Fundulus diaphanus","Banded killifish",["native"],"novice",["weedy shallows"]),
-  S("Golden Shiner","Notemigonus crysoleucas","Golden shiner",["native"],"novice",["baitfish"]),
-  S("Rainbow Smelt (freshwater)","Osmerus mordax","Rainbow smelt",["native"],"novice",["landlocked/anadromous"]),
-  S("Lake Whitefish","Coregonus clupeaformis","Lake whitefish",["native"],"master",["whitefish"]),
-  S("Threespine Stickleback","Gasterosteus aculeatus","Three-spined stickleback",["native"],"master",["coastal & inland"]),
-  S("Ninespine Stickleback","Pungitius pungitius","Nine-spined stickleback",["native"],"master",["ponds"]),
-  S("Splake (hybrid)","Salvelinus namaycush × S. fontinalis","Splake",["stocked"],"master",["hybrid"]),
-  S("Atlantic Salmon (parr)","Salmo salar","Atlantic salmon",["native"],"grandMaster",["juvenile ID"]),
-  S("Blacknose Dace","Rhinichthys atratulus","Blacknose dace",["native"],"grandMaster",["minnow"]),
-  S("Atlantic Whitefish","Coregonus huntsmani","Atlantic whitefish",["native"],"grandMaster",["endemic"]),
+// Belt thresholds
+const BELTS = [
+  {name:"White",  min:0,   class:"white"},
+  {name:"Blue",   min:50,  class:"blue"},
+  {name:"Purple", min:65,  class:"purple"},
+  {name:"Brown",  min:80,  class:"brown"},
+  {name:"Black",  min:90,  class:"black"},
 ];
-function S(common,scientific,wiki,statuses,difficulty,tags){ return {common,scientific,wiki,statuses,difficulty,tags,id:scientific}; }
+
+/*** ---------------------- DATA ---------------------- ***/
+const FISH = [
+  S("Brook Trout","Salvelinus fontinalis","Brook trout"),
+  S("Yellow Perch","Perca flavescens","Yellow perch"),
+  S("White Perch","Morone americana","White perch"),
+  S("Smallmouth Bass","Micropterus dolomieu","Smallmouth bass"),
+  S("Chain Pickerel","Esox niger","Chain pickerel"),
+  S("Pumpkinseed","Lepomis gibbosus","Pumpkinseed"),
+  S("Rainbow Trout","Oncorhynchus mykiss","Rainbow trout"),
+  S("Brown Trout","Salmo trutta","Brown trout"),
+  S("White Sucker","Catostomus commersonii","White sucker"),
+  S("American Eel","Anguilla rostrata","American eel"),
+  S("Banded Killifish","Fundulus diaphanus","Banded killifish"),
+  S("Golden Shiner","Notemigonus crysoleucas","Golden shiner"),
+  S("Rainbow Smelt (freshwater)","Osmerus mordax","Rainbow smelt"),
+  S("Lake Whitefish","Coregonus clupeaformis","Lake whitefish"),
+  S("Threespine Stickleback","Gasterosteus aculeatus","Three-spined stickleback"),
+  S("Ninespine Stickleback","Pungitius pungitius","Nine-spined stickleback"),
+  S("Splake (hybrid)","Salvelinus namaycush × S. fontinalis","Splake"),
+  S("Atlantic Salmon (parr)","Salmo salar","Atlantic salmon"),
+  S("Blacknose Dace","Rhinichthys atratulus","Blacknose dace"),
+  S("Atlantic Whitefish","Coregonus huntsmani","Atlantic whitefish"),
+];
+function S(common,scientific,wiki){ return {common,scientific,wiki,id:scientific}; }
 
 /*** ---------------------- STATE ---------------------- ***/
 const $ = s=>document.querySelector(s);
 const home=$("#home"), lesson=$("#lesson");
-const xpEl=$("#xp"), streakEl=$("#streak"), unlockedEl=$("#unlocked");
-const heartsEl=$("#hearts"), levelName=$("#levelName"), qIndexEl=$("#qIndex"), qTotalEl=$("#qTotal");
+const xpEl=$("#xp"), streakEl=$("#streak");
+const heartsHome=$("#heartsHome");
+const rankLabel=$("#rankLabel"), bestPercentEl=$("#bestPercent");
+const heartsEl=$("#hearts"), qIndexEl=$("#qIndex"), correctCountEl=$("#correctCount");
 const img=$("#img"), imgLoader=$("#imgLoader"), credit=$("#credit");
 const opts=$("#opts"), resultEl=$("#result");
 const nextBtn=$("#nextBtn"), quitBtn=$("#quitBtn");
+const startBtn=$("#startBtn");
 const aboutBtn=$("#aboutBtn"), aboutDetails=$("#aboutDetails");
-const installBtn=$("#installBtn");
 const shareBtn=$("#shareBtn"), shareBtn2=$("#shareBtn2");
 const donateBtn=$("#donateBtn"), donateBtn2=$("#donateBtn2");
 const practiceCard=$("#practiceCard"), practiceBtn=$("#practiceBtn"), practiceCount=$("#practiceCount");
@@ -232,84 +214,58 @@ const practiceCard=$("#practiceCard"), practiceBtn=$("#practiceBtn"), practiceCo
 let store = {
   xp: +localStorage.getItem("xp") || 0,
   streak: +localStorage.getItem("streak") || 0,
-  unlocked: localStorage.getItem("unlocked") || "beginner",
+  bestPercent: +localStorage.getItem("bestPercent") || 0,
+  bestBelt: localStorage.getItem("bestBelt") || "White",
   mistakes: JSON.parse(localStorage.getItem("mistakes")||"[]")
 };
-renderStats(); renderPracticeCard();
-
-function saveMistakes(){ localStorage.setItem("mistakes", JSON.stringify(store.mistakes)); renderPracticeCard(); }
-function addMistake(id){ if(!store.mistakes.includes(id)){ store.mistakes.push(id); saveMistakes(); } }
-function clearMistake(id){ const i=store.mistakes.indexOf(id); if(i>=0){ store.mistakes.splice(i,1); saveMistakes(); } }
 
 function setXP(v){ store.xp=v; localStorage.setItem("xp",v); xpEl.textContent=v; }
 function addXP(v){ setXP(store.xp+v); }
 function setStreak(v){ store.streak=v; localStorage.setItem("streak",v); streakEl.textContent=v; }
 function bumpStreak(correct){ setStreak(correct ? store.streak+1 : 0); }
-function unlockIfNeeded(levelKey){
-  if(order.indexOf(levelKey) > order.indexOf(store.unlocked)){
-    store.unlocked = levelKey; localStorage.setItem("unlocked", levelKey);
-  }
-  unlockedEl.textContent = Difficulty[store.unlocked].title;
+
+function beltForPercent(p){
+  let b = BELTS[0];
+  for(const belt of BELTS){ if(p >= belt.min) b=belt; }
+  return b;
 }
-function renderStats(){
+function renderHeader(){
   xpEl.textContent = store.xp;
   streakEl.textContent = store.streak;
-  unlockedEl.textContent = Difficulty[store.unlocked].title;
-  document.querySelectorAll(".level").forEach(el=>{
-    const key = el.dataset.level;
-    const locked = order.indexOf(key) > order.indexOf(store.unlocked);
-    el.style.opacity = locked ? .55 : 1;
-    el.style.pointerEvents = locked ? "none" : "auto";
-  });
+  bestPercentEl.textContent = `${store.bestPercent}%`;
+  const b = BELTS.find(x=>x.name===store.bestBelt) || BELTS[0];
+  rankLabel.textContent = b.name; rankLabel.className = `belt ${b.class}`;
 }
 function renderPracticeCard(){
   const count = store.mistakes.length;
   practiceCount.textContent = `${count} ${count===1?"species":"species"} saved`;
   practiceCard.classList.toggle("hide", count===0);
 }
+renderHeader(); renderPracticeCard();
 
-/*** ---------------------- QUIZ ENGINE ---------------------- ***/
-let vm = { mode:"level", levelKey:"beginner", hearts:3, questions:[], idx:0 };
-function startPractice(){
-  const pool = FISH.filter(f=>store.mistakes.includes(f.id));
-  if(pool.length===0){
-    showSheet("<p>No mistakes saved yet. Miss a species in lessons and it will appear here.</p><div class='row' style='margin-top:8px'><div></div><div style='margin-left:auto'><button id='ok'>OK</button></div></div>", ({close})=>{$("#ok").onclick=close});
-    return;
-  }
-  vm.mode="practice"; startLessonInternal(pool, "Practice");
-}
-function startLesson(levelKey){
-  vm.mode="level";
-  const pool = FISH.filter(f=>f.difficulty===levelKey);
-  startLessonInternal(pool, Difficulty[levelKey].title, levelKey);
-}
-function startLessonInternal(pool, title, levelKey=null){
-  vm.levelKey = levelKey || "practice";
-  vm.hearts = 3;
-  const count = (vm.mode==="practice") ? Math.min(12, pool.length) : Math.min(Difficulty[levelKey].questions, pool.length);
-  const picks = shuffle(pool).slice(0,count);
-  vm.questions = picks.map(f=>{
-    let others = pool.filter(o=>o.id!==f.id);
-    if(others.length < 3) others = FISH.filter(o=>o.id!==f.id);
-    const options = shuffle([f, ...shuffle(others).slice(0,3)]);
-    return {fish:f, options};
-  });
-  vm.idx = 0;
-
+/*** ---------------------- QUIZ ENGINE (50-question run) ---------------------- ***/
+let vm = {
+  hearts: 3,
+  total: 50,
+  idx: 0,
+  correct: 0,
+  images: [],   // current image set
+  imageIdx: 0,  // current index in image set
+  q: null
+};
+function startRun(){
+  vm.hearts = 3; vm.idx = 0; vm.correct = 0;
+  heartsHome.textContent = '3';
   home.classList.add("hide"); lesson.classList.remove("hide");
-  levelName.textContent = title;
-  qTotalEl.textContent = String(vm.questions.length);
-  heartsEl.textContent = String(vm.hearts);
-  resultEl.textContent = "";
-  nextBtn.disabled = true;
-  loadImage();
-  renderQ();
+  heartsEl.textContent = '3'; qIndexEl.textContent = '1'; correctCountEl.textContent = '0';
+  nextBtn.disabled = true; resultEl.textContent = "";
+  renderQuestion();
 }
-function renderQ(){
-  qIndexEl.textContent = String(vm.idx+1);
-  const q = vm.questions[vm.idx];
+
+function renderQuestion(){
+  vm.q = makeQuestion();
   opts.innerHTML = "";
-  q.options.forEach(opt=>{
+  vm.q.options.forEach(opt=>{
     const b = document.createElement("button");
     b.className="opt";
     b.innerHTML = `<div><strong>${opt.common}</strong></div><div class="sci">${opt.scientific}</div>`;
@@ -318,121 +274,203 @@ function renderQ(){
   });
   resultEl.className="result"; resultEl.textContent="";
   nextBtn.disabled = true;
-}
-
-/*** ---------------------- IMAGE LOADER (with Wikimedia fallback) ---------------------- ***/
-async function wikiImage(title){
-  // 1) Try REST summary (fast)
-  const sURL = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
-  try{
-    const r = await fetch(sURL, {mode:'cors', cache:'force-cache'});
-    if(r.ok){
-      const j = await r.json();
-      const src = j.originalimage?.source || j.thumbnail?.source || null;
-      const page = j.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
-      if(src) return {url:src, page};
+  // load images (up to 5)
+  loadImagesFor(vm.q.fish).then(set => {
+    vm.images = set.length ? set : [];
+    vm.imageIdx = 0;
+    if(vm.images.length){
+      showImage(vm.images[0], vm.q.fish);
+    }else{
+      img.classList.add("hide");
+      imgLoader.classList.remove("hide");
+      imgLoader.textContent = "No image found — you can still answer.";
+      credit.innerHTML = "";
     }
-  }catch(_){}
-
-  // 2) Fallback to PageImages API (often finds something when summary has none)
-  try{
-    const api = new URL('https://commons.wikimedia.org/w/api.php');
-    api.search = new URLSearchParams({
-      origin:'*',
-      action:'query',
-      titles:title,
-      prop:'pageimages',
-      piprop:'original|thumbnail',
-      pithumbsize:'1000',
-      format:'json'
-    }).toString();
-    const r2 = await fetch(api.toString(), {mode:'cors'});
-    const j2 = await r2.json();
-    const pageObj = Object.values(j2.query?.pages || {})[0] || {};
-    const src = pageObj.original?.source || pageObj.thumbnail?.source || null;
-    if(src) return {url:src, page:`https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`};
-  }catch(_){}
-
-  // 3) Give up
-  return {url:null, page:`https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`};
+  });
 }
 
-async function loadImage(){
-  const q = vm.questions[vm.idx];
-  img.classList.add("hide"); imgLoader.classList.remove("hide");
-  credit.textContent = "Loading image…";
-  const info = await wikiImage(q.fish.wiki);
-  if(info.url){
-    img.src = info.url;
-    img.alt = `Identify this fish: ${q.fish.common}`;
-    img.onload = ()=>{
-      imgLoader.classList.add("hide");
-      img.classList.remove("hide");
-      credit.innerHTML = `Image via <a href="${info.page}" target="_blank" rel="noopener">Wikipedia</a>`;
-    };
-    img.onerror = ()=>{
-      imgLoader.classList.add("hide");
-      credit.innerHTML = `<span style="color:#fca5a5">Image failed to load — try Next.</span>`;
-    };
-  }else{
-    imgLoader.classList.add("hide");
-    credit.innerHTML = `<span style="color:#fca5a5">No image available for this species — tap Next.</span>`;
-  }
+function makeQuestion(){
+  const fish = choice(FISH);
+  let others = shuffle(FISH.filter(x=>x.id!==fish.id)).slice(0,3);
+  const options = shuffle([fish, ...others]);
+  return {fish, options};
 }
 
-/*** ---------------------- Quiz flow ---------------------- ***/
 function answer(chosen){
-  const q = vm.questions[vm.idx];
-  const correct = chosen.id === q.fish.id;
+  const correct = chosen.id === vm.q.fish.id;
   bumpStreak(correct);
   if(correct){
+    vm.correct += 1; correctCountEl.textContent = String(vm.correct);
     addXP(10);
-    resultEl.className = "result ok";
-    resultEl.textContent = "Correct!";
-    clearMistake(q.fish.id);
+    resultEl.className = "result ok"; resultEl.textContent = "Correct!";
+    clearMistake(vm.q.fish.id);
   }else{
     vm.hearts -= 1; heartsEl.textContent = String(vm.hearts);
-    resultEl.className = "result no";
-    resultEl.textContent = `Answer: ${q.fish.common}`;
-    addMistake(q.fish.id);
+    resultEl.className = "result no"; resultEl.textContent = `Answer: ${vm.q.fish.common}`;
+    addMistake(vm.q.fish.id);
   }
   [...opts.children].forEach(b=>b.disabled = true);
   nextBtn.disabled = false;
 }
+
 function next(){
-  if(vm.hearts <= 0){ return finish(false); }
+  if(vm.hearts <= 0) return finish();
   vm.idx += 1;
-  if(vm.idx >= vm.questions.length){ return finish(true); }
-  renderQ(); loadImage();
+  if(vm.idx >= vm.total) return finish();
+  qIndexEl.textContent = String(vm.idx+1);
+  renderQuestion();
 }
-function finish(passed){
-  if(vm.mode==="level" && passed && vm.hearts > 0){
-    const nextIdx = Math.min(order.indexOf(vm.levelKey)+1, order.length-1);
-    unlockIfNeeded(order[nextIdx]);
-    addXP( (Difficulty[vm.levelKey].questions) * 5 );
+
+function finish(){
+  const attempted = vm.idx + 1;
+  const pct = Math.round((vm.correct / attempted) * 100);
+  const belt = beltForPercent(pct);
+  // Save best
+  if(pct > (store.bestPercent||0)){ store.bestPercent = pct; localStorage.setItem("bestPercent", pct); }
+  if(BELTS.findIndex(b=>b.name===belt.name) > BELTS.findIndex(b=>b.name===store.bestBelt)){
+    store.bestBelt = belt.name; localStorage.setItem("bestBelt", belt.name);
   }
+  renderHeader();
+
   showSheet(`
-    <h3 style="margin:0 0 6px">${passed? "Nice work!" : "Out of hearts"}</h3>
-    <p style="margin:0 0 12px;color:var(--muted)">
-      ${vm.mode==="practice" ? "Practice session complete." :
-        (passed? "Lesson complete. XP awarded; next tier may be unlocked." : "Give it another shot — you’ve got this.")}
+    <h3 style="margin:0 0 6px">Run complete</h3>
+    <p style="margin:0 0 8px;color:var(--muted)">
+      Score: <strong>${vm.correct}/${attempted}</strong> (${pct}%)
     </p>
-    <div class="row">
-      <button class="ghost" id="againBtn">${vm.mode==="practice"?"Practice again":"Try again"}</button>
-      <div style="margin-left:auto"><button id="homeBtn">Home</button></div>
+    <p>Your belt: <span class="belt ${belt.class}">${belt.name}</span></p>
+    <div class="row" style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="ghost" id="againBtn">Again</button>
+      <button id="homeBtn">Home</button>
     </div>
   `, ({close})=>{
-    $("#againBtn").onclick = ()=>{ close(); vm.mode==="practice" ? startPractice() : startLesson(vm.levelKey); };
+    $("#againBtn").onclick = ()=>{ close(); startRun(); };
     $("#homeBtn").onclick  = ()=>{ close(); goHome(); };
   });
 }
+
 function goHome(){
   lesson.classList.add("hide");
   home.classList.remove("hide");
-  renderStats(); renderPracticeCard();
+  renderHeader(); renderPracticeCard();
 }
 
+/*** ---------------------- MISTAKES ---------------------- ***/
+function saveMistakes(){ localStorage.setItem("mistakes", JSON.stringify(store.mistakes)); renderPracticeCard(); }
+function addMistake(id){ if(!store.mistakes.includes(id)){ store.mistakes.push(id); saveMistakes(); } }
+function clearMistake(id){ const i=store.mistakes.indexOf(id); if(i>=0){ store.mistakes.splice(i,1); saveMistakes(); } }
+function startPractice(){
+  const pool = FISH.filter(f=>store.mistakes.includes(f.id));
+  if(pool.length===0){
+    showSheet("<p>No mistakes saved yet. Miss a species during runs and it will appear here.</p><div style='text-align:right'><button id='ok'>OK</button></div>", ({close})=>{$("#ok").onclick=close});
+    return;
+  }
+  // practice behaves like short run with only mistakes pool
+  vm.hearts = 3; vm.idx = 0; vm.correct = 0; vm.total = Math.min(12, pool.length);
+  home.classList.add("hide"); lesson.classList.remove("hide");
+  heartsEl.textContent = '3'; qIndexEl.textContent = '1'; correctCountEl.textContent = '0';
+  nextBtn.disabled = true; resultEl.textContent = "";
+  vm.makeFromPool = ()=> {
+    const fish = choice(pool);
+    let others = shuffle((pool.length>3?pool:FISH).filter(x=>x.id!==fish.id)).slice(0,3);
+    return {fish, options:shuffle([fish,...others])};
+  };
+  renderQuestionFromPool();
+}
+function renderQuestionFromPool(){
+  vm.q = vm.makeFromPool();
+  opts.innerHTML = "";
+  vm.q.options.forEach(opt=>{
+    const b = document.createElement("button");
+    b.className="opt";
+    b.innerHTML = `<div><strong>${opt.common}</strong></div><div class="sci">${opt.scientific}</div>`;
+    b.onclick = ()=>answer(opt);
+    opts.appendChild(b);
+  });
+  resultEl.className="result"; resultEl.textContent=""; nextBtn.disabled = true;
+  loadImagesFor(vm.q.fish).then(set => {
+    vm.images = set; vm.imageIdx = 0;
+    if(vm.images.length){ showImage(vm.images[0], vm.q.fish); }
+    else { img.classList.add("hide"); imgLoader.classList.remove("hide"); imgLoader.textContent = "No image found — you can still answer."; credit.innerHTML=""; }
+  });
+}
+function nextPractice(){
+  if(vm.hearts <= 0) return goHome();
+  vm.idx += 1;
+  if(vm.idx >= vm.total) return goHome();
+  qIndexEl.textContent = String(vm.idx+1);
+  renderQuestionFromPool();
+}
+
+/*** ---------------------- IMAGE PIPELINE ---------------------- ***/
+// Get up to 5 image URLs for a species using Wikipedia + Commons (no keys, CORS-safe)
+async function loadImagesFor(fish){
+  // Step A: get images attached to the species page
+  const titlesUrl = `https://en.wikipedia.org/w/api.php?origin=*&action=query&titles=${encodeURIComponent(fish.wiki)}&prop=images&imlimit=max&format=json`;
+  let fileTitles = [];
+  try{
+    const r = await fetch(titlesUrl);
+    const j = await r.json();
+    const page = Object.values(j.query.pages)[0];
+    fileTitles = (page.images||[]).map(im=>im.title).filter(name=>{
+      const n = name.toLowerCase();
+      const goodExt = /\.(jpg|jpeg|png)$/i.test(n);
+      const bad = ['map','range','distribution','logo','icon','vector','diagram','svg'];
+      return goodExt && !bad.some(b=>n.includes(b));
+    });
+  }catch(_){}
+  // Step B: fetch URLs for up to 5 files
+  let urls = [];
+  if(fileTitles.length){
+    const batch = fileTitles.slice(0,12).join('|');
+    try{
+      const infoUrl = `https://en.wikipedia.org/w/api.php?origin=*&action=query&titles=${encodeURIComponent(batch)}&prop=imageinfo&iiprop=url&iiurlwidth=1200&format=json`;
+      const r2 = await fetch(infoUrl);
+      const j2 = await r2.json();
+      const pages = Object.values(j2.query.pages||{});
+      urls = pages.map(p=>p.imageinfo?.[0]?.thumburl || p.imageinfo?.[0]?.url).filter(Boolean).slice(0,5);
+    }catch(_){}
+  }
+  // Step C: fallback to summary image if nothing
+  if(!urls.length){
+    const sum = await summaryImage(fish.wiki);
+    if(sum) urls = [sum];
+  }
+  return urls;
+}
+
+async function summaryImage(title){
+  try{
+    const r = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`, {mode:'cors', cache:'force-cache'});
+    if(!r.ok) return null;
+    const j = await r.json();
+    return j.originalimage?.source || j.thumbnail?.source || null;
+  }catch(_){ return null; }
+}
+
+function showImage(src, fish){
+  img.src = src; img.alt = `Identify this fish: ${fish.common}`;
+  img.onload = ()=>{
+    imgLoader.classList.add("hide");
+    img.classList.remove("hide");
+    credit.innerHTML = `Image via <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(fish.wiki)}" target="_blank" rel="noopener">Wikipedia/Commons</a> — tap image to change`;
+  };
+  img.onerror = ()=>{
+    img.classList.add("hide");
+    imgLoader.classList.remove("hide");
+    imgLoader.textContent = "Image failed to load — tap Next.";
+    credit.innerHTML = "";
+  };
+}
+
+// Tap image to cycle through fetched set
+$("#imgFrame").addEventListener('click', ()=>{
+  if(!vm.images.length) return;
+  vm.imageIdx = (vm.imageIdx + 1) % vm.images.length;
+  showImage(vm.images[vm.imageIdx], vm.q.fish);
+});
+
 /*** ---------------------- UI HELPERS ---------------------- ***/
+function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
 function showSheet(html, wire){
   const modal = document.createElement("div");
@@ -446,14 +484,14 @@ function showSheet(html, wire){
 }
 
 /*** ---------------------- EVENTS ---------------------- ***/
-document.querySelectorAll(".level").forEach(el=> el.addEventListener('click', ()=> startLesson(el.dataset.level)));
-nextBtn.addEventListener('click', next);
+startBtn.addEventListener('click', ()=>{ vm.total = 50; startRun(); });
+nextBtn.addEventListener('click', ()=> vm.makeFromPool ? nextPractice() : next());
 quitBtn.addEventListener('click', goHome);
 
 // About button opens inline details
 aboutBtn.addEventListener('click', () => { aboutDetails.open = true; aboutDetails.scrollIntoView({behavior:'smooth'}); });
 
-// Donate buttons
+// Donate
 donateBtn.onclick = ()=> window.open(DONATE_URL, "_blank", "noopener");
 donateBtn2.onclick = ()=> window.open(DONATE_URL, "_blank", "noopener");
 
@@ -467,30 +505,21 @@ function doShare(){
   else {
     navigator.clipboard.writeText(window.location.href).then(()=> {
       showSheet(`<p style="margin:0 0 10px">Link copied! Paste it anywhere to share.</p>
-                 <div class="row"><div></div><div style="margin-left:auto"><button id="okClose">OK</button></div></div>`,
+                 <div style="text-align:right"><button id="okClose">OK</button></div>`,
         ({close})=>{ $("#okClose").onclick = close; });
-    }).catch(()=>{
-      showSheet(`<p style="margin:0 0 10px">Couldn’t copy automatically. Here’s the link:</p>
-                 <input value="${window.location.href}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #273042;background:#0b1221;color:#e5e7eb" />
-                 <div class="row" style="margin-top:10px"><div></div><div style="margin-left:auto"><button id="okClose2">OK</button></div></div>`,
-        ({close})=>{ $("#okClose2").onclick = close; });
     });
   }
 }
-shareBtn.onclick = doShare;
-shareBtn2.onclick = doShare;
+shareBtn.onclick = doShare; shareBtn2.onclick = doShare;
 
-/*** ---------------------- PWA: manifest + SW + install ---------------------- ***/
-const manifest = {
-  name:"NS Fish Trainer", short_name:"NS Fish", start_url:"./", display:"standalone",
+/*** ---------------------- PWA bits (manifest + SW + install) ---------------------- ***/
+const manifest = { name:"NS Fish Trainer", short_name:"NS Fish", start_url:"./", display:"standalone",
   background_color:"#0f172a", theme_color:"#0f172a",
-  icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%230f172a'/%3E%3Cpath d='M20 70c18-14 36-22 56-22 8 0 16 6 24 12-8 6-16 12-24 12-18 0-32 6-44 16l-12-18z' fill='%2322c55e'/%3E%3Ccircle cx='84' cy='56' r='5' fill='%23000'/%3E%3C/svg%3E",sizes:"128x128", type:"image/svg+xml"}]
-};
+  icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%230f172a'/%3E%3Cpath d='M20 70c18-14 36-22 56-22 8 0 16 6 24 12-8 6-16 12-24 12-18 0-32 6-44 16l-12-18z' fill='%2322c55e'/%3E%3Ccircle cx='84' cy='56' r='5' fill='%23000'/%3E%3C/svg%3E",sizes:"128x128", type:"image/svg+xml"}] };
 const mblob = new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"});
 const murl = URL.createObjectURL(mblob);
 const mlink = document.createElement('link'); mlink.rel='manifest'; mlink.href=murl; document.head.appendChild(mlink);
 
-// Service worker
 if('serviceWorker' in navigator){
   const swCode = `
     const CACHE='ns-fish-v1';
@@ -509,35 +538,33 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register(URL.createObjectURL(blob));
 }
 
-// Install: Chrome/Android prompt + iOS instructions
-let deferredPrompt=null;
+// Install prompt (Android/Chrome) + iOS instruction sheet
+let deferredPrompt=null, installBtn=$("#installBtn");
 window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault(); deferredPrompt=e; if(installBtn) installBtn.textContent="Install app";
   if(installBtn){
     installBtn.onclick=async ()=>{
       if(!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt=null;
+      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null;
     };
   }
 });
 if(/iphone|ipad|ipod/i.test(navigator.userAgent) && installBtn){
   installBtn.addEventListener('click', () => {
     showSheet(`<p style="margin:0 0 10px">On iPhone/iPad: tap the Share button, then “Add to Home Screen”.</p>
-               <div class="row"><div></div><div style="margin-left:auto"><button id="ok">OK</button></div></div>`,
-      ({close})=>{ document.querySelector('#ok').onclick = close; });
+               <div style="text-align:right"><button id="ok">OK</button></div>`,
+      ({close})=>{ $("#ok").onclick = close; });
   });
 }
 
-/*** ---------------------- START ---------------------- ***/
+/*** ---------------------- INIT ---------------------- ***/
 function initKeyboard(){
   window.addEventListener('keydown', (e)=>{
-    if(e.key.toLowerCase()==='n' && !nextBtn.disabled) next();
+    if(e.key.toLowerCase()==='n' && !nextBtn.disabled) (vm.makeFromPool?nextPractice():next)();
     if(e.key.toLowerCase()==='h') goHome();
   });
 }
-renderStats(); renderPracticeCard(); initKeyboard();
+initKeyboard();
 </script>
 </body>
 </html>
